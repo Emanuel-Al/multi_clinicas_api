@@ -6,30 +6,27 @@ import com.multiclinicas.api.mappers.ClinicaMapper;
 import com.multiclinicas.api.models.Clinica;
 import com.multiclinicas.api.services.ClinicaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clinicas")
+@RequiredArgsConstructor
 public class ClinicaController {
 
-    @Autowired
-    private ClinicaService clinicaService;
+    private final ClinicaService clinicaService;
 
-    @Autowired
-    private ClinicaMapper clinicaMapper;
+    private final ClinicaMapper clinicaMapper;
 
     @GetMapping
     public ResponseEntity<List<ClinicaDTO>> getAllClinicas() {
         List<Clinica> clinicas = clinicaService.findAll();
         List<ClinicaDTO> dtos = clinicas.stream()
-                .map(clinicaMapper::toDTO)
-                .collect(Collectors.toList());
+                .map(clinicaMapper::toDTO).toList();
         return ResponseEntity.ok(dtos);
     }
 
