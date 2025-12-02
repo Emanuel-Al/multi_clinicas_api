@@ -5,7 +5,12 @@ import com.multiclinicas.api.dtos.PlanoSaudeCreateDTO;
 import com.multiclinicas.api.dtos.PlanoSaudeDTO;
 import com.multiclinicas.api.mappers.PlanoSaudeMapper;
 import com.multiclinicas.api.models.PlanoSaude;
+import com.multiclinicas.api.config.WebConfig;
+import com.multiclinicas.api.config.tenant.TenantInterceptor;
+import com.multiclinicas.api.repositories.ClinicaRepository;
 import com.multiclinicas.api.services.PlanoSaudeService;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PlanoSaudeController.class)
+@Import({ WebConfig.class, TenantInterceptor.class })
 class PlanoSaudeControllerTest {
 
     @Autowired
@@ -35,6 +41,14 @@ class PlanoSaudeControllerTest {
 
     @MockitoBean
     private PlanoSaudeMapper planoSaudeMapper;
+
+    @MockitoBean
+    private ClinicaRepository clinicaRepository;
+
+    @BeforeEach
+    void setup() {
+        when(clinicaRepository.existsById(1L)).thenReturn(true);
+    }
 
     @Test
     @DisplayName("Deve retornar 400 Bad Request se header X-Clinic-ID estiver faltando")

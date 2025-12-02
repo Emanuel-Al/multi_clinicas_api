@@ -1,17 +1,22 @@
 package com.multiclinicas.api.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.multiclinicas.api.config.WebConfig;
+import com.multiclinicas.api.config.tenant.TenantInterceptor;
 import com.multiclinicas.api.dtos.ClinicaCreateDTO;
 import com.multiclinicas.api.dtos.ClinicaDTO;
 import com.multiclinicas.api.exceptions.ResourceNotFoundException;
 import com.multiclinicas.api.mappers.ClinicaMapper;
 import com.multiclinicas.api.models.Clinica;
+import com.multiclinicas.api.repositories.ClinicaRepository;
 import com.multiclinicas.api.services.ClinicaService;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ClinicaController.class)
+@Import({ WebConfig.class, TenantInterceptor.class })
 class ClinicaControllerTest {
 
     @Autowired
@@ -34,11 +40,21 @@ class ClinicaControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private ClinicaService clinicaService;
 
-    @MockBean
+    @MockitoBean
     private ClinicaMapper clinicaMapper;
+
+    @MockitoBean
+    private ClinicaRepository clinicaRepository;
+
+    @BeforeEach
+    void setup() {
+        // Necessário para o TenantInterceptor, mesmo que excluído, para garantir que o
+        // contexto suba
+        when(clinicaRepository.existsById(any())).thenReturn(true);
+    }
 
     @Test
     @DisplayName("Deve retornar lista de clínicas")

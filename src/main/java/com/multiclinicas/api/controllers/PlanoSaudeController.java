@@ -1,5 +1,6 @@
 package com.multiclinicas.api.controllers;
 
+import com.multiclinicas.api.config.tenant.TenantContext;
 import com.multiclinicas.api.dtos.PlanoSaudeCreateDTO;
 import com.multiclinicas.api.dtos.PlanoSaudeDTO;
 import com.multiclinicas.api.mappers.PlanoSaudeMapper;
@@ -25,7 +26,8 @@ public class PlanoSaudeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PlanoSaudeDTO>> findAll(@RequestHeader("X-Clinic-ID") Long clinicId) {
+    public ResponseEntity<List<PlanoSaudeDTO>> findAll() {
+        Long clinicId = TenantContext.getClinicId();
         List<PlanoSaude> planos = planoSaudeService.findAllByClinicId(clinicId);
         return ResponseEntity.ok(planos.stream()
                 .map(planoSaudeMapper::toDTO)
@@ -33,14 +35,15 @@ public class PlanoSaudeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlanoSaudeDTO> findById(@PathVariable Long id, @RequestHeader("X-Clinic-ID") Long clinicId) {
+    public ResponseEntity<PlanoSaudeDTO> findById(@PathVariable Long id) {
+        Long clinicId = TenantContext.getClinicId();
         PlanoSaude plano = planoSaudeService.findByIdAndClinicId(id, clinicId);
         return ResponseEntity.ok(planoSaudeMapper.toDTO(plano));
     }
 
     @PostMapping
-    public ResponseEntity<PlanoSaudeDTO> create(@RequestHeader("X-Clinic-ID") Long clinicId,
-            @RequestBody @Valid PlanoSaudeCreateDTO dto) {
+    public ResponseEntity<PlanoSaudeDTO> create(@RequestBody @Valid PlanoSaudeCreateDTO dto) {
+        Long clinicId = TenantContext.getClinicId();
         PlanoSaude plano = planoSaudeMapper.toEntity(dto);
         PlanoSaude createdPlano = planoSaudeService.create(clinicId, plano);
         return ResponseEntity.status(HttpStatus.CREATED).body(planoSaudeMapper.toDTO(createdPlano));
@@ -48,15 +51,16 @@ public class PlanoSaudeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PlanoSaudeDTO> update(@PathVariable Long id,
-            @RequestHeader("X-Clinic-ID") Long clinicId,
             @RequestBody @Valid PlanoSaudeCreateDTO dto) {
+        Long clinicId = TenantContext.getClinicId();
         PlanoSaude plano = planoSaudeMapper.toEntity(dto);
         PlanoSaude updatedPlano = planoSaudeService.update(id, clinicId, plano);
         return ResponseEntity.ok(planoSaudeMapper.toDTO(updatedPlano));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, @RequestHeader("X-Clinic-ID") Long clinicId) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Long clinicId = TenantContext.getClinicId();
         planoSaudeService.delete(id, clinicId);
         return ResponseEntity.noContent().build();
     }
