@@ -18,7 +18,6 @@ import java.util.Set;
 @Table(name = "medicos", uniqueConstraints = @UniqueConstraint(columnNames = { "clinic_id", "crm" }))
 public class Medico extends BaseUsuario {
 
-	@Column(length = 9)
     private String crm;
 
     private Boolean ativo = true;
