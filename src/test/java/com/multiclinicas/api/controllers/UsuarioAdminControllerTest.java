@@ -11,6 +11,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.multiclinicas.api.config.WebConfig;
 import com.multiclinicas.api.config.tenant.TenantInterceptor;
+import com.multiclinicas.api.dtos.CreateEnderecoDTO;
 import com.multiclinicas.api.dtos.EnderecoDTO;
 import com.multiclinicas.api.dtos.UsuarioAdminCreateDTO;
 import com.multiclinicas.api.dtos.UsuarioAdminDTO;
@@ -38,6 +40,7 @@ import com.multiclinicas.api.repositories.ClinicaRepository;
 import com.multiclinicas.api.services.UsuarioAdminService;
 
 @WebMvcTest(UsuarioAdminController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import({ WebConfig.class, TenantInterceptor.class })
 class UsuarioAdminControllerTest {
 
@@ -66,8 +69,12 @@ class UsuarioAdminControllerTest {
     void setup() {
         when(clinicaRepository.existsById(clinicId)).thenReturn(true);
 
-        Endereco endereco = new Endereco(1L, "12345-678", "Rua Teste", "123", null, "Bairro Teste", "Cidade Teste", "TS", "Brasil");
-        enderecoDTO = new EnderecoDTO(1L, "12345-678", "Rua Teste", "123", null, "Bairro Teste", "Cidade Teste", "TS", "Brasil");
+        Endereco endereco = new Endereco(1L, "12345-678", "Rua Teste", "123", null, "Bairro Teste", "Cidade Teste",
+                "TS", "Brasil");
+        enderecoDTO = new EnderecoDTO(1L, "12345-678", "Rua Teste", "123", null, "Bairro Teste", "Cidade Teste", "TS",
+                "Brasil");
+        CreateEnderecoDTO createEnderecoDTO = new CreateEnderecoDTO("12345-678", "Rua Teste", "123", null,
+                "Bairro Teste", "Cidade Teste", "TS", "Brasil");
 
         usuarioAdmin = new UsuarioAdmin();
         usuarioAdmin.setId(1L);
@@ -77,8 +84,10 @@ class UsuarioAdminControllerTest {
         usuarioAdmin.setRole(Role.ADMIN);
         usuarioAdmin.setEndereco(endereco);
 
-        usuarioAdminDTO = new UsuarioAdminDTO(1L, "Admin Teste", "123.456.789-00", "99999-9999", null, "admin@teste.com", Role.ADMIN, enderecoDTO);
-        usuarioAdminCreateDTO = new UsuarioAdminCreateDTO("Admin Teste", "123.456.789-00", "99999-9999", null, "admin@teste.com", "senha123", Role.ADMIN, enderecoDTO);
+        usuarioAdminDTO = new UsuarioAdminDTO(1L, "Admin Teste", "123.456.789-00", "99999-9999", null,
+                "admin@teste.com", Role.ADMIN, enderecoDTO);
+        usuarioAdminCreateDTO = new UsuarioAdminCreateDTO("Admin Teste", "123.456.789-00", "99999-9999", null,
+                "admin@teste.com", "senha123", Role.ADMIN, createEnderecoDTO);
     }
 
     @Test
@@ -127,10 +136,12 @@ class UsuarioAdminControllerTest {
         updatedUser.setNome("Admin Atualizado");
         updatedUser.setEmail("admin.atualizado@teste.com");
 
-        UsuarioAdminDTO updatedDto = new UsuarioAdminDTO(userId, "Admin Atualizado", null, null, null, "admin.atualizado@teste.com", Role.ADMIN, null);
+        UsuarioAdminDTO updatedDto = new UsuarioAdminDTO(userId, "Admin Atualizado", null, null, null,
+                "admin.atualizado@teste.com", Role.ADMIN, null);
 
         when(usuarioAdminMapper.toEntity(any(UsuarioAdminCreateDTO.class))).thenReturn(usuarioAdmin);
-        when(usuarioAdminService.updateUsuarioAdmin(eq(userId), eq(clinicId), any(UsuarioAdmin.class))).thenReturn(updatedUser);
+        when(usuarioAdminService.updateUsuarioAdmin(eq(userId), eq(clinicId), any(UsuarioAdmin.class)))
+                .thenReturn(updatedUser);
         when(usuarioAdminMapper.toDTO(any(UsuarioAdmin.class))).thenReturn(updatedDto);
 
         mockMvc.perform(put("/usuario-admin/{id}", userId)

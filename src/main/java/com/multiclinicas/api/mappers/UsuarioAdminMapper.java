@@ -19,15 +19,14 @@ public class UsuarioAdminMapper {
             return null;
         }
         return new UsuarioAdminDTO(
-            usuario.getId(),
-            usuario.getNome(),
-            usuario.getCpf(),
-            usuario.getTelefone(),
-            usuario.getTelefoneSecundario(),
-            usuario.getEmail(),
-            usuario.getRole(),
-            enderecoMapper.toDTO(usuario.getEndereco())
-        );
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getCpf(),
+                usuario.getTelefone(),
+                usuario.getTelefoneSecundario(),
+                usuario.getEmail(),
+                usuario.getRole(),
+                enderecoMapper.toDto(usuario.getEndereco()));
     }
 
     public UsuarioAdmin toEntity(UsuarioAdminCreateDTO dto) {
